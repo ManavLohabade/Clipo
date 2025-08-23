@@ -362,4 +362,78 @@ export class Web3Service {
       throw error;
     }
   }
+
+  /**
+   * Deploy a new campaign (alias for createCampaign)
+   */
+  async deployCampaign(campaignData: any, userId: string): Promise<any> {
+    try {
+      const { brandAddress, rewardTokenAddress, totalBudget, minDepositRatio, duration } = campaignData;
+      
+      const campaignAddress = await this.createCampaign(
+        brandAddress,
+        rewardTokenAddress,
+        totalBudget,
+        minDepositRatio,
+        duration
+      );
+
+      return {
+        success: true,
+        campaignAddress,
+        deployedBy: userId,
+        transactionHash: campaignAddress, // This should be the actual tx hash
+        timestamp: new Date()
+      };
+    } catch (error) {
+      this.logger.error('Failed to deploy campaign:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Distribute reward to a user
+   */
+  async distributeReward(rewardData: any, userId: string): Promise<any> {
+    try {
+      const { campaignAddress, userAddress, amount, tokenAddress } = rewardData;
+      
+      // For now, return mock data since we need to implement actual reward distribution
+      // TODO: Implement actual reward distribution logic
+      return {
+        success: true,
+        campaignAddress,
+        userAddress,
+        amount,
+        tokenAddress,
+        distributedBy: userId,
+        timestamp: new Date(),
+        transactionHash: `mock_tx_${Date.now()}`
+      };
+    } catch (error) {
+      this.logger.error('Failed to distribute reward:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get wallet balance
+   */
+  async getBalance(address: string): Promise<any> {
+    try {
+      const balance = await this.provider.getBalance(address);
+      const network = await this.provider.getNetwork();
+      
+      return {
+        address,
+        balance: ethers.utils.formatEther(balance),
+        network: network.name,
+        chainId: Number(network.chainId),
+        timestamp: new Date()
+      };
+    } catch (error) {
+      this.logger.error('Failed to get balance:', error);
+      throw error;
+    }
+  }
 }

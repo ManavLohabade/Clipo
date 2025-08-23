@@ -1,16 +1,20 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+// import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import * as compression from 'compression';
-import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Security middleware - temporarily disabled for debugging
-  // app.use(helmet());
-  // app.use(compression());
+  // Global prefix
+  app.setGlobalPrefix('api/v1');
+
+  // Validation pipe
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
+  }));
 
   // CORS configuration
   app.enableCors({
@@ -18,40 +22,28 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Global validation pipe
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    }),
-  );
+  // Swagger documentation - temporarily disabled due to versioning issues
+  // const config = new DocumentBuilder()
+  //   .setTitle('Clipper DApp API')
+  //   .setDescription('Blockchain-powered campaign engagement platform API')
+  //   .setVersion('1.0')
+  //   .addBearerAuth()
+  //   .addTag('auth', 'Authentication endpoints')
+  //   .addTag('users', 'User management endpoints')
+  //   .addTag('campaigns', 'Campaign management endpoints')
+  //   .addTag('engagements', 'Engagement tracking endpoints')
+  //   .addTag('web3', 'Blockchain integration endpoints')
+  //   .addTag('social-media', 'Social media integration endpoints')
+  //   .build();
 
-  // Global prefix
-  app.setGlobalPrefix('api/v1');
+  // const document = SwaggerModule.createDocument(app, config);
+  // SwaggerModule.setup('api/docs', app, document);
 
-  // Swagger documentation
-  const config = new DocumentBuilder()
-    .setTitle('Clipper DApp API')
-    .setDescription('Campaign engagement platform API for viral content creators')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .addTag('auth', 'Authentication endpoints')
-    .addTag('campaigns', 'Campaign management endpoints')
-    .addTag('users', 'User management endpoints')
-    .addTag('engagement', 'Engagement tracking endpoints')
-    .addTag('web3', 'Blockchain interaction endpoints')
-    .build();
-
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
-
-  // Start application
   const port = process.env.PORT || 3001;
   await app.listen(port);
   
   console.log(`🚀 Clipper DApp Backend running on port ${port}`);
-  console.log(`📚 API Documentation available at http://localhost:${port}/api/docs`);
+  console.log(`📚 API Documentation temporarily disabled - will be re-enabled after fixing versioning issues`);
 }
 
 bootstrap();

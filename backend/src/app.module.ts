@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
@@ -19,24 +19,20 @@ import { AppService } from './app.service';
     // Configuration
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['env.local', '.env'],
+      envFilePath: ['.env', 'env.local', 'env.example'],
     }),
 
-    // Database
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'clipper-dapp.db',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: process.env.NODE_ENV !== 'production',
-      logging: process.env.NODE_ENV === 'development',
+    // Database - MongoDB (compatible configuration for NestJS v10 + Mongoose v7)
+    MongooseModule.forRoot('mongodb://localhost:27017/Clipper_DApp'),
+
+    // JWT Configuration
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || 'fallback_secret',
+      signOptions: { expiresIn: process.env.JWT_EXPIRES_IN || '24h' },
     }),
 
     // Authentication
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'your-secret-key',
-      signOptions: { expiresIn: '24h' },
-    }),
-    PassportModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
 
     // Feature modules
     AuthModule,
