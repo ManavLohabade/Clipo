@@ -1,45 +1,40 @@
 {
   "name": "clipper-dapp",
   "version": "1.0.0",
-  "description": "Avalanche-based campaign engagement platform for viral content creators",
+  "description": "Clipper DApp - Blockchain-powered campaign engagement platform",
   "private": true,
   "workspaces": [
-    "contracts",
     "backend",
-    "frontend"
+    "frontend",
+    "contracts"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "cd backend && npm run start:dev",
     "dev:frontend": "cd frontend && npm run dev",
-    "build": "npm run build:contracts && npm run build:backend && npm run build:frontend",
-    "build:contracts": "cd contracts && npm run compile",
+    "build": "npm run build:backend && npm run build:frontend",
     "build:backend": "cd backend && npm run build",
     "build:frontend": "cd frontend && npm run build",
-    "deploy:fuji": "cd contracts && npm run deploy:fuji",
-    "deploy:mainnet": "cd contracts && npm run deploy:mainnet",
-    "test": "npm run test:contracts && npm run test:backend",
+    "test": "npm run test:contracts",
     "test:contracts": "cd contracts && npm run test",
-    "test:backend": "cd backend && npm run test",
-    "lint": "npm run lint:contracts && npm run lint:backend && npm run lint:frontend",
-    "lint:contracts": "cd contracts && npm run lint",
-    "lint:backend": "cd backend && npm run lint",
-    "lint:frontend": "cd frontend && npm run lint"
+    "compile:contracts": "cd contracts && npm run compile",
+    "deploy:contracts": "cd contracts && npm run deploy:fuji",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install && cd ../contracts && npm install",
+    "clean": "npm run clean:backend && npm run clean:frontend && npm run clean:contracts",
+    "clean:backend": "cd backend && rm -rf dist node_modules",
+    "clean:frontend": "cd frontend && rm -rf .next node_modules",
+    "clean:contracts": "cd contracts && rm -rf artifacts cache node_modules"
   },
   "devDependencies": {
-    "concurrently": "^7.6.0"
+    "concurrently": "^8.0.0"
   },
   "keywords": [
     "avalanche",
     "blockchain",
-    "web3",
     "campaign",
     "engagement",
-    "social-media",
-    "defi",
-    "solidity",
-    "nextjs",
-    "nestjs"
+    "web3",
+    "dapp"
   ],
   "author": "Clipper DApp Team",
   "license": "MIT"

@@ -19,7 +19,7 @@ import { AppService } from './app.service';
     // Configuration
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env.local', '.env'],
+      envFilePath: ['env.local', '.env'],
     }),
 
     // Database

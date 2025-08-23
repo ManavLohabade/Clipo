@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ethers } from 'ethers';
+import type { BigNumber } from 'ethers';
 
 // Contract ABIs (simplified for brevity)
 const CAMPAIGN_FACTORY_ABI = [
@@ -67,20 +68,32 @@ export class Web3Service {
       
       // Initialize admin wallet
       const privateKey = this.configService.get('ADMIN_PRIVATE_KEY');
-      if (privateKey) {
-        this.adminWallet = new ethers.Wallet(privateKey, this.provider);
-        this.logger.log(`Admin wallet initialized: ${this.adminWallet.address}`);
+      if (privateKey && privateKey !== 'your_admin_private_key_here') {
+        try {
+          this.adminWallet = new ethers.Wallet(privateKey, this.provider);
+          this.logger.log(`Admin wallet initialized: ${this.adminWallet.address}`);
+        } catch (error) {
+          this.logger.warn('Invalid admin private key, skipping wallet initialization');
+        }
+      } else {
+        this.logger.warn('Admin private key not configured, wallet functionality disabled');
       }
 
       // Initialize campaign factory contract
       const factoryAddress = this.configService.get('CAMPAIGN_FACTORY_ADDRESS');
-      if (factoryAddress) {
-        this.campaignFactoryContract = new ethers.Contract(
-          factoryAddress,
-          CAMPAIGN_FACTORY_ABI,
-          this.provider
-        );
-        this.logger.log(`Campaign factory initialized: ${factoryAddress}`);
+      if (factoryAddress && factoryAddress !== 'your-deployed-factory-address') {
+        try {
+          this.campaignFactoryContract = new ethers.Contract(
+            factoryAddress,
+            CAMPAIGN_FACTORY_ABI,
+            this.provider
+          );
+          this.logger.log(`Campaign factory initialized: ${factoryAddress}`);
+        } catch (error) {
+          this.logger.warn('Invalid factory address, contract functionality disabled');
+        }
+      } else {
+        this.logger.warn('Campaign factory address not configured, contract functionality disabled');
       }
 
       this.logger.log(`Web3 service initialized for ${network} network`);
@@ -123,7 +136,7 @@ export class Web3Service {
       const tx = await contract.createCampaign(
         brandAddress,
         rewardTokenAddress,
-        ethers.parseUnits(totalBudget, 6), // Assuming USDC with 6 decimals
+        ethers.utils.parseUnits(totalBudget, 6), // Assuming USDC with 6 decimals
         minDepositRatio,
         duration
       );
@@ -168,7 +181,7 @@ export class Web3Service {
         campaignAddress: info.campaignAddress,
         brand: info.brand,
         rewardToken: info.rewardToken,
-        totalBudget: ethers.formatUnits(info.totalBudget, 6),
+        totalBudget: ethers.utils.formatUnits(info.totalBudget, 6),
         createdAt: new Date(Number(info.createdAt) * 1000),
         active: info.active
       };
@@ -190,13 +203,13 @@ export class Web3Service {
       
       return {
         state: this.getCampaignStateString(stats.state),
-        balance: ethers.formatUnits(stats.balance, 6),
-        engagement: ethers.formatUnits(stats.engagement, 6),
+        balance: ethers.utils.formatUnits(stats.balance, 6),
+        engagement: ethers.utils.formatUnits(stats.engagement, 6),
         milestone: Number(stats.milestone),
         timeRemaining: Number(stats.timeRemaining),
         milestones: milestones.map(m => ({
           engagementThreshold: Number(m.engagementThreshold),
-          fundingRequired: ethers.formatUnits(m.fundingRequired, 6),
+          fundingRequired: ethers.utils.formatUnits(m.fundingRequired, 6),
           unlocked: m.unlocked
         }))
       };
@@ -224,7 +237,7 @@ export class Web3Service {
       
       const tx = await contract.submitEngagement(
         userAddress,
-        ethers.parseUnits(score.toString(), 6),
+        ethers.utils.parseUnits(score.toString(), 6),
         postUrl
       );
 
@@ -249,11 +262,11 @@ export class Web3Service {
       const rewards = await contract.calculateRewards(userAddress);
       
       return {
-        totalScore: ethers.formatUnits(stats.totalScore, 6),
-        totalRewards: ethers.formatUnits(stats.totalRewards, 6),
+        totalScore: ethers.utils.formatUnits(stats.totalScore, 6),
+        totalRewards: ethers.utils.formatUnits(stats.totalRewards, 6),
         submissionCount: Number(stats.submissionCount),
         isBlacklisted: stats.isBlacklisted,
-        currentRewards: ethers.formatUnits(rewards, 6)
+        currentRewards: ethers.utils.formatUnits(rewards, 6)
       };
     } catch (error) {
       this.logger.error('Failed to get user stats:', error);
@@ -279,7 +292,7 @@ export class Web3Service {
         name,
         symbol,
         decimals: Number(decimals),
-        totalSupply: ethers.formatUnits(totalSupply, Number(decimals))
+        totalSupply: ethers.utils.formatUnits(totalSupply, Number(decimals))
       };
     } catch (error) {
       this.logger.error('Failed to get token info:', error);
@@ -342,7 +355,7 @@ export class Web3Service {
         chainId: Number(network.chainId),
         name: network.name,
         blockNumber,
-        gasPrice: gasPrice.gasPrice ? ethers.formatUnits(gasPrice.gasPrice, 'gwei') : '0'
+        gasPrice: gasPrice.gasPrice ? ethers.utils.formatUnits(gasPrice.gasPrice, 'gwei') : '0'
       };
     } catch (error) {
       this.logger.error('Failed to get network info:', error);

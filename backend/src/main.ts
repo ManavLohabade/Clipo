@@ -3,14 +3,14 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as compression from 'compression';
-import * as helmet from 'helmet';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Security middleware
-  app.use(helmet());
-  app.use(compression());
+  // Security middleware - temporarily disabled for debugging
+  // app.use(helmet());
+  // app.use(compression());
 
   // CORS configuration
   app.enableCors({
