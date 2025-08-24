@@ -59,7 +59,7 @@ const LandingPage: React.FC = () => {
               <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">C</span>
               </div>
-              <span className="text-orange-500 font-bold text-xl">Clipper</span>
+              <span className="text-orange-500 font-bold text-xl">Clipo</span>
             </div>
 
             {/* Center Navigation - Focused on Content Rewards */}

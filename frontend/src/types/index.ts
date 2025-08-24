@@ -63,7 +63,7 @@ export const BrandProfileSchema = z.object({
 
 export type BrandProfile = z.infer<typeof BrandProfileSchema>;
 
-// Clipper Profile Schema
+// Content Creator Profile Schema
 export const ClipperProfileSchema = z.object({
   id: z.string(),
   userId: z.string(),
@@ -86,6 +86,33 @@ export const ClipperProfileSchema = z.object({
 });
 
 export type ClipperProfile = z.infer<typeof ClipperProfileSchema>;
+
+// Content Creator-specific fields
+export interface CreatorFields {
+  bio?: string;
+  categories?: string[];
+  socialLinks?: z.infer<typeof ClipperProfileSchema>['socialLinks'];
+}
+
+// Content Creator Profile Schema
+export const CreatorProfileSchema = z.object({
+  id: z.string(),
+  bio: z.string().optional(),
+  categories: z.array(z.string()).optional(),
+  socialLinks: z.array(z.object({
+    platform: z.enum(['x', 'instagram', 'youtube', 'facebook', 'tiktok']),
+    username: z.string(),
+    url: z.string(),
+    verified: z.boolean().default(false),
+    followers: z.number().optional(),
+  })).optional(),
+  totalEarnings: z.number().optional(),
+  totalCampaigns: z.number().optional(),
+  totalSubmissions: z.number().optional(),
+  approvalRate: z.number().optional(),
+});
+
+export type CreatorProfile = z.infer<typeof CreatorProfileSchema>;
 
 // Payout Rule Schema
 export const PayoutRuleSchema = z.object({

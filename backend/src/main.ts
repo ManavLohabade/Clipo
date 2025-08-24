@@ -42,8 +42,5 @@ async function bootstrap() {
   const port = process.env.PORT || 3001;
   await app.listen(port);
   
-  console.log(`🚀 Clipper DApp Backend running on port ${port}`);
-  console.log(`📚 API Documentation temporarily disabled - will be re-enabled after fixing versioning issues`);
-}
-
-bootstrap();
+  console.log(`🚀 Clipo Backend running on port ${port}`);
+  console.log(`

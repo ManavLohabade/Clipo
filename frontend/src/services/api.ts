@@ -1,4 +1,4 @@
-// Mock API service layer for Clipper DAO
+// Mock API service layer for Clipo DAO
 import { 
   User, 
   Campaign, 
@@ -77,7 +77,7 @@ export class AuthService {
       registrationData.website = profile.website || '';
       registrationData.description = profile.description || '';
     } else if (role === 'clipper') {
-      registrationData.bio = profile.bio || 'Content creator on Clipper';
+      registrationData.bio = profile.bio || 'Content creator on Clipo';
       registrationData.categories = profile.categories || [];
       registrationData.socialLinks = profile.socialLinks || [];
     }
@@ -162,8 +162,8 @@ export class SubmissionService {
     return apiCall(`/submissions?campaignId=${campaignId}`);
   }
 
-  static async listByClipper(clipperId: string): Promise<ApiResponse<Submission[]>> {
-    return apiCall(`/submissions?clipperId=${clipperId}`);
+  static async listByCreator(creatorId: string): Promise<ApiResponse<Submission[]>> {
+    return apiCall(`/submissions?creatorId=${creatorId}`);
   }
 
   static async getById(id: string): Promise<ApiResponse<Submission>> {
@@ -312,13 +312,13 @@ export class AnalyticsService {
     return apiCall(`/analytics/brands/${brandId}/roi`);
   }
 
-  static async getCreatorPerformance(clipperId: string): Promise<ApiResponse<{
-    totalEarnings: number;
-    totalSubmissions: number;
-    approvalRate: number;
-    avgEngagement: number;
+  static async getCreatorPerformance(creatorId: string): Promise<ApiResponse<{
+    totalViews: number;
+    totalEngagement: number;
+    averageEngagementRate: number;
+    topPerformingContent: Submission[];
   }>> {
-    return apiCall(`/analytics/creators/${clipperId}/performance`);
+    return apiCall(`/analytics/creators/${creatorId}/performance`);
   }
 }
 

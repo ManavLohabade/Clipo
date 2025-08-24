@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Mail, Lock, User, Building, Users } from 'lucide-react';
+import { ArrowLeft, Mail, Lock, User, Building, Users, CheckCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserRole } from '@/types';
@@ -87,7 +87,7 @@ const Register: React.FC = () => {
             <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">C</span>
             </div>
-            <span className="text-orange-500 font-bold text-xl">Clipper</span>
+            <span className="text-orange-500 font-bold text-xl">Clipo</span>
           </div>
 
           {/* Navigation */}

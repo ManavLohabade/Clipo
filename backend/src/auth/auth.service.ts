@@ -67,7 +67,7 @@ export class AuthService {
       if (createUserDto.role === 'clipper') {
         if (!createUserDto.bio) {
           // Set a default bio if none provided
-          createUserDto.bio = 'Content creator on Clipper';
+          createUserDto.bio = 'Content creator on Clipo';
         }
       }
 

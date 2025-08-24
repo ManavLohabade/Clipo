@@ -65,7 +65,7 @@ export default function Register() {
       await register(email, password, role);
       toast({
         title: 'Account created!',
-        description: 'Welcome to Clipper DAO. Your account has been created successfully.',
+        description: 'Welcome to Clipo. Your account has been created successfully.',
       });
       navigate('/dashboard');
     } catch (error) {
@@ -95,12 +95,12 @@ export default function Register() {
             <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center">
               <Sparkles className="h-6 w-6 text-primary-foreground" />
             </div>
-            <span className="text-2xl font-bold text-gradient">Clipper DAO</span>
+            <span className="text-2xl font-bold text-gradient">Clipo</span>
           </div>
           
           <h1 className="text-2xl font-bold mb-2">Create Account</h1>
           <p className="text-muted-foreground">
-            Join thousands of brands and creators on Clipper DAO
+            Join thousands of brands and creators on Clipo
           </p>
         </div>
 
@@ -261,7 +261,7 @@ export default function Register() {
         {/* Footer */}
         <div className="text-center mt-8 text-sm text-muted-foreground">
           <p>
-            Join over 5,000 creators and 500+ brands already using Clipper DAO
+            Join over 5,000 creators and 500+ brands already using Clipo
           </p>
         </div>
       </div>

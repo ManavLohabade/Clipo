@@ -41,7 +41,7 @@ const DEMO_USERS: Record<UserRole, User> = {
     username: 'demo_clipper',
     role: 'clipper',
     firstName: 'Demo',
-    lastName: 'Creator',
+    lastName: 'Content Creator',
     avatar: '/api/placeholder/128/128',
     isKycVerified: true,
     createdAt: new Date(),

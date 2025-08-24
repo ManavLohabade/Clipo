@@ -51,7 +51,7 @@ export class User {
   @Prop()
   teamSize?: string;
 
-  // Clipper-specific fields
+  // Content Creator-specific fields
   @Prop()
   bio?: string;
 

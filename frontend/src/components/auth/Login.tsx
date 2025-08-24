@@ -53,7 +53,7 @@ const Login: React.FC = () => {
             <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">C</span>
             </div>
-            <span className="text-orange-500 font-bold text-xl">Clipper</span>
+            <span className="text-orange-500 font-bold text-xl">Clipo</span>
           </div>
 
           {/* Navigation */}
@@ -91,7 +91,7 @@ const Login: React.FC = () => {
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-500 rounded-2xl mb-4">
                   <span className="text-white font-bold text-3xl">C</span>
                 </div>
-                <h1 className="text-2xl font-bold text-white">Sign in to Clipper</h1>
+                <h1 className="text-2xl font-bold text-white">Sign in to Clipo</h1>
                 <p className="text-gray-400 mt-2">Welcome back! Please sign in to your account</p>
               </div>
 
@@ -102,81 +102,66 @@ const Login: React.FC = () => {
                 </div>
               )}
 
-              {/* Email Form */}
-              <form onSubmit={handleSubmit} className="space-y-4 mb-6">
-                <div className="space-y-2">
+              {/* Login Form */}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
                   <Label htmlFor="email" className="text-white">Email</Label>
-                  <div className="relative">
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="Enter your email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 h-12 text-base pl-10"
-                    />
-                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                      <Mail className="w-5 h-5 text-gray-400" />
-                    </div>
-                  </div>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+                    placeholder="Enter your email"
+                  />
                 </div>
 
-                <div className="space-y-2">
+                <div>
                   <Label htmlFor="password" className="text-white">Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      name="password"
-                      type="password"
-                      placeholder="Enter your password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      required
-                      className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 h-12 text-base pl-10"
-                    />
-                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                      <Lock className="w-5 h-5 text-gray-400" />
-                    </div>
-                  </div>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    className="bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+                    placeholder="Enter your password"
+                  />
                 </div>
 
                 <Button 
                   type="submit" 
+                  className="w-full bg-orange-500 hover:bg-orange-600 text-white h-12"
                   disabled={isLoading}
-                  className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white py-3 text-base font-medium"
                 >
                   {isLoading ? 'Signing in...' : 'Sign in'}
                 </Button>
               </form>
 
-              {/* Separator */}
-              <div className="relative my-6">
-                <Separator className="bg-gray-700" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="bg-gray-900 px-4 text-gray-400 text-sm">OR</span>
+              {/* Demo Login Options */}
+              <div className="mt-6">
+                <Separator className="my-4" />
+                <div className="text-center text-sm text-gray-400 mb-4">Or continue with demo accounts</div>
+                
+                <div className="space-y-3">
+                  <Button 
+                    onClick={() => navigate('/discover')} 
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                    disabled={isLoading}
+                  >
+                    Continue as Content Creator (Demo)
+                  </Button>
+                  <Button 
+                    onClick={() => navigate('/discover')} 
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+                    disabled={isLoading}
+                  >
+                    Continue as Brand (Demo)
+                  </Button>
                 </div>
-              </div>
-
-              {/* Demo Login Buttons */}
-              <div className="space-y-3 mb-6">
-                <Button 
-                  variant="outline" 
-                  className="w-full border-gray-600 text-white hover:bg-gray-800 h-12 bg-white hover:bg-gray-100"
-                  onClick={() => navigate('/discover')}
-                >
-                  <Users className="mr-3 flex-shrink-0" />
-                  <span className="text-black font-medium">Continue as Creator (Demo)</span>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full border-gray-600 text-white hover:bg-gray-800 h-12 bg-white hover:bg-gray-100"
-                  onClick={() => navigate('/create-campaign')}
-                >
-                  <Building className="mr-3 flex-shrink-0" />
-                  <span className="text-black font-medium">Continue as Brand (Demo)</span>
-                </Button>
               </div>
 
               {/* Register Link */}

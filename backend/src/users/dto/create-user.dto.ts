@@ -65,8 +65,8 @@ export class CreateUserDto {
   @IsString()
   teamSize?: string;
 
-  // Clipper-specific fields
-  @ApiPropertyOptional({ description: 'Bio for content creators' })
+  // Content Creator-specific fields
+  @ApiPropertyOptional({ description: 'Bio/description for content creators' })
   @IsOptional()
   @IsString()
   bio?: string;

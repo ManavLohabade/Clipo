@@ -359,7 +359,7 @@ export default function Dashboard() {
     default:
       return (
         <div className="text-center py-12">
-          <h1 className="text-2xl font-bold mb-4">Welcome to Clipper DAO</h1>
+          <h1 className="text-2xl font-bold mb-4">Welcome to Clipo</h1>
           <p className="text-muted-foreground">Your dashboard will appear here based on your role.</p>
         </div>
       );

@@ -40,7 +40,7 @@ function decodeJWT(token) {
 function main() {
   const secret = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
   
-  console.log('🔐 JWT Token Generator for Clipper DApp\n');
+  console.log('🔐 JWT Token Generator for Clipo\n');
   
   // Example payloads
   const userPayload = {
