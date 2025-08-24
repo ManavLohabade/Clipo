@@ -1,0 +1,19 @@
+{
+  "name": "@clipo/contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for Clipo campaign engagement platform",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "blockchain",
+    "avalanche",
+    "smart-contracts",
+    "campaign",
+    "engagement",
+    "solidity"
+  ],
+  "author": "Clipo Team",
+  "license": "MIT"
+}
