@@ -1,73 +1,45 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
-import LandingPage from "@/components/LandingPage";
-import Login from "@/pages/auth/Login";
-import Register from "@/pages/auth/Register";
-import Dashboard from "@/pages/Dashboard";
-import Settings from "@/pages/Settings";
-import BrandCampaigns from "@/pages/brand/Campaigns";
-import ClipperCampaigns from "@/pages/clipper/Campaigns";
-import NotFound from "@/pages/NotFound";
-import DashboardLayout from "@/components/layout/DashboardLayout";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'sonner';
+import { AuthProvider } from './contexts/AuthContext';
+import { CampaignProvider } from './contexts/CampaignContext';
+import LandingPage from './components/LandingPage';
+import Discover from './components/Discover';
+import Login from './components/auth/Login';
+import Register from './components/auth/Register';
+import CreateCampaign from './components/campaigns/CreateCampaign';
+import CampaignDetail from './components/campaigns/CampaignDetail';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import './index.css';
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
+function App() {
+  return (
     <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/auth/login" element={<Login />} />
-            <Route path="/auth/register" element={<Register />} />
-            <Route path="/dashboard" element={
-              <DashboardLayout>
-                <Dashboard />
-              </DashboardLayout>
-            } />
-            <Route path="/settings" element={
-              <DashboardLayout>
-                <Settings />
-              </DashboardLayout>
-            } />
-            <Route path="/brand/campaigns" element={
-              <DashboardLayout>
-                <BrandCampaigns />
-              </DashboardLayout>
-            } />
-            <Route path="/clipper/campaigns" element={
-              <DashboardLayout>
-                <ClipperCampaigns />
-              </DashboardLayout>
-            } />
-            <Route path="/brand/*" element={
-              <DashboardLayout>
-                <Dashboard />
-              </DashboardLayout>
-            } />
-            <Route path="/clipper/*" element={
-              <DashboardLayout>
-                <Dashboard />
-              </DashboardLayout>
-            } />
-            <Route path="/admin/*" element={
-              <DashboardLayout>
-                <Dashboard />
-              </DashboardLayout>
-            } />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <CampaignProvider>
+        <Router>
+          <div className="App">
+            <Routes>
+              <Route path="/" element={<Discover />} />
+              <Route path="/content-rewards" element={<LandingPage />} />
+              <Route path="/discover" element={<Discover />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route 
+                path="/create-campaign" 
+                element={
+                  <ProtectedRoute requiredRole="brand" redirectTo="/login">
+                    <CreateCampaign />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route path="/campaign/:campaignId" element={<CampaignDetail />} />
+            </Routes>
+            <Toaster />
+          </div>
+        </Router>
+      </CampaignProvider>
     </AuthProvider>
-  </QueryClientProvider>
-);
+  );
+}
 
 export default App;

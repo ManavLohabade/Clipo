@@ -1,123 +1,103 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-import { User, UserDocument } from './schemas/user.schema';
-import { CreateUserDto, UpdateUserDto } from './dto';
-import * as bcrypt from 'bcryptjs';
+import { Injectable } from '@nestjs/common';
+import { CreateUserDto } from './dto';
+
+// Simple interface for in-memory storage
+interface SimpleUser {
+  id: string;
+  email: string;
+  username: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  avatar?: string;
+  role: 'clipper' | 'brand' | 'admin';
+  isVerified: boolean;
+  isActive: boolean;
+  walletAddress?: string;
+  companyName?: string;
+  website?: string;
+  description?: string;
+  industry?: string;
+  teamSize?: string;
+  bio?: string;
+  categories: string[];
+  socialLinks: Array<{
+    platform: string;
+    username: string;
+    url: string;
+    verified: boolean;
+    followers?: number;
+  }>;
+  socialMediaAccounts?: {
+    twitter?: string;
+    instagram?: string;
+    youtube?: string;
+    tiktok?: string;
+    linkedin?: string;
+  };
+  campaigns: any[];
+  engagements: any[];
+  totalEarnings: number;
+  totalCampaigns: number;
+  totalSubmissions: number;
+  approvalRate: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
-  ) {}
+  private users: SimpleUser[] = [];
+  private nextId = 1;
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    // Check if user already exists
-    const existingUser = await this.userModel.findOne({
-      $or: [
-        { email: createUserDto.email },
-        { username: createUserDto.username }
-      ]
-    });
+  async create(createUserDto: CreateUserDto): Promise<SimpleUser> {
+    const user: SimpleUser = {
+      id: (this.nextId++).toString(),
+      email: createUserDto.email,
+      username: createUserDto.username,
+      password: createUserDto.password, // In production, this should be hashed
+      firstName: createUserDto.firstName,
+      lastName: createUserDto.lastName,
+      avatar: createUserDto.avatar,
+      role: createUserDto.role || 'clipper',
+      isVerified: false,
+      isActive: true,
+      walletAddress: createUserDto.walletAddress,
+      companyName: createUserDto.companyName,
+      website: createUserDto.website,
+      description: createUserDto.description,
+      industry: createUserDto.industry,
+      teamSize: createUserDto.teamSize,
+      bio: createUserDto.bio,
+      categories: createUserDto.categories || [],
+      socialLinks: createUserDto.socialLinks?.map(link => ({
+        ...link,
+        verified: link.verified || false
+      })) || [],
+      socialMediaAccounts: createUserDto.socialMediaAccounts,
+      campaigns: [],
+      engagements: [],
+      totalEarnings: 0,
+      totalCampaigns: 0,
+      totalSubmissions: 0,
+      approvalRate: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
 
-    if (existingUser) {
-      throw new ConflictException('User with this email or username already exists');
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-
-    const createdUser = new this.userModel({
-      ...createUserDto,
-      password: hashedPassword,
-    });
-
-    return createdUser.save();
-  }
-
-  async findAll(): Promise<User[]> {
-    return this.userModel.find().select('-password').exec();
-  }
-
-  async findById(id: string): Promise<User> {
-    const user = await this.userModel.findById(id).select('-password').exec();
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    this.users.push(user);
     return user;
   }
 
-  async findByEmail(email: string): Promise<User> {
-    return this.userModel.findOne({ email }).exec();
+  async findByEmail(email: string): Promise<SimpleUser | null> {
+    return this.users.find(user => user.email === email) || null;
   }
 
-  async findByUsername(username: string): Promise<User> {
-    return this.userModel.findOne({ username }).exec();
+  async findById(id: string): Promise<SimpleUser | null> {
+    return this.users.find(user => user.id === id) || null;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    // If password is being updated, hash it
-    if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
-    }
-
-    const updatedUser = await this.userModel
-      .findByIdAndUpdate(id, updateUserDto, { new: true })
-      .select('-password')
-      .exec();
-
-    if (!updatedUser) {
-      throw new NotFoundException('User not found');
-    }
-
-    return updatedUser;
-  }
-
-  async delete(id: string): Promise<void> {
-    const result = await this.userModel.findByIdAndDelete(id).exec();
-    if (!result) {
-      throw new NotFoundException('User not found');
-    }
-  }
-
-  async getUserCampaigns(userId: string): Promise<any[]> {
-    const user = await this.userModel
-      .findById(userId)
-      .populate('campaigns')
-      .exec();
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    return user.campaigns || [];
-  }
-
-  async getUserEngagements(userId: string): Promise<any[]> {
-    const user = await this.userModel
-      .findById(userId)
-      .populate('engagements')
-      .exec();
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    return user.engagements || [];
-  }
-
-  async updateLastLogin(userId: string): Promise<void> {
-    await this.userModel
-      .findByIdAndUpdate(userId, { lastLoginAt: new Date() })
-      .exec();
-  }
-
-  async verifyEmail(userId: string): Promise<void> {
-    await this.userModel
-      .findByIdAndUpdate(userId, { 
-        isVerified: true, 
-        emailVerifiedAt: new Date() 
-      })
-      .exec();
+  async findAll(): Promise<SimpleUser[]> {
+    return this.users;
   }
 }

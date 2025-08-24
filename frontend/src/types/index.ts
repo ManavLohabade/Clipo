@@ -24,6 +24,19 @@ export const UserSchema = z.object({
   location: z.string().optional(),
   role: z.enum(['guest', 'clipper', 'brand', 'admin']),
   isKycVerified: z.boolean().default(false),
+  // Brand-specific fields
+  companyName: z.string().optional(),
+  industry: z.string().optional(),
+  teamSize: z.string().optional(),
+  // Clipper-specific fields
+  categories: z.array(z.string()).default([]),
+  socialLinks: z.array(z.object({
+    platform: z.enum(['x', 'instagram', 'youtube', 'facebook', 'tiktok']),
+    username: z.string(),
+    url: z.string(),
+    verified: z.boolean().default(false),
+    followers: z.number().optional(),
+  })).default([]),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

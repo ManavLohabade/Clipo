@@ -1,8 +1,7 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/dto';
-import { User, UserDocument } from '../users/schemas/user.schema';
 import * as bcrypt from 'bcryptjs';
 
 @Injectable()
@@ -15,18 +14,16 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
     if (user && await bcrypt.compare(password, user.password)) {
-      // Convert to plain object and remove password
-      const userObj = (user as any).toObject ? (user as any).toObject() : user;
-      const { password: _, ...result } = userObj;
+      // Return user without password
+      const { password: _, ...result } = user;
       return result;
     }
     return null;
   }
 
   async login(user: any) {
-    const userId = (user as any)._id?.toString() || user.id;
     const payload = { 
-      id: userId, 
+      id: user.id, 
       email: user.email, 
       username: user.username, 
       role: user.role 
@@ -34,7 +31,7 @@ export class AuthService {
     
     return {
       user: {
-        id: userId,
+        id: user.id,
         email: user.email,
         username: user.username,
         firstName: user.firstName,
@@ -42,6 +39,10 @@ export class AuthService {
         role: user.role,
         isVerified: user.isVerified,
         walletAddress: user.walletAddress,
+        companyName: user.companyName,
+        bio: user.bio,
+        categories: user.categories,
+        socialLinks: user.socialLinks,
         socialMediaAccounts: user.socialMediaAccounts,
       },
       accessToken: this.jwtService.sign(payload),
@@ -50,10 +51,42 @@ export class AuthService {
 
   async register(createUserDto: CreateUserDto) {
     try {
-      const user = await this.usersService.create(createUserDto);
+      // Check if user already exists
+      const existingUser = await this.usersService.findByEmail(createUserDto.email);
+      if (existingUser) {
+        throw new ConflictException('User with this email already exists');
+      }
+
+      // Validate role-specific requirements
+      if (createUserDto.role === 'brand') {
+        if (!createUserDto.companyName) {
+          throw new BadRequestException('Company name is required for brand accounts');
+        }
+      }
+
+      if (createUserDto.role === 'clipper') {
+        if (!createUserDto.bio) {
+          // Set a default bio if none provided
+          createUserDto.bio = 'Content creator on Clipper';
+        }
+      }
+
+      // Set default role if not specified
+      if (!createUserDto.role) {
+        createUserDto.role = 'clipper';
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+      const userData = { ...createUserDto, password: hashedPassword };
+
+      const user = await this.usersService.create(userData);
       return this.login(user);
     } catch (error) {
       if (error instanceof ConflictException) {
+        throw error;
+      }
+      if (error instanceof BadRequestException) {
         throw error;
       }
       throw new Error('Registration failed');
@@ -67,7 +100,7 @@ export class AuthService {
     }
 
     const payload = { 
-      id: (user as any)._id?.toString() || userId, 
+      id: user.id, 
       email: user.email, 
       username: user.username, 
       role: user.role 

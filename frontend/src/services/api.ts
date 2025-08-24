@@ -61,9 +61,30 @@ export class AuthService {
   }
 
   static async register(email: string, password: string, role: UserRole, profile: Partial<BrandProfile | ClipperProfile>): Promise<ApiResponse<User>> {
+    // Prepare registration data based on role
+    const registrationData: any = {
+      email,
+      password,
+      role,
+      username: email.split('@')[0], // Generate username from email
+      firstName: profile.firstName || '',
+      lastName: profile.lastName || '',
+    };
+
+    // Add role-specific fields
+    if (role === 'brand') {
+      registrationData.companyName = profile.companyName || '';
+      registrationData.website = profile.website || '';
+      registrationData.description = profile.description || '';
+    } else if (role === 'clipper') {
+      registrationData.bio = profile.bio || 'Content creator on Clipper';
+      registrationData.categories = profile.categories || [];
+      registrationData.socialLinks = profile.socialLinks || [];
+    }
+
     return apiCall('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ email, password, role, ...profile }),
+      body: JSON.stringify(registrationData),
     });
   }
 

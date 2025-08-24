@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsOptional, MinLength, IsEnum } from 'class-validator';
+import { IsEmail, IsString, IsOptional, MinLength, IsEnum, IsArray } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateUserDto {
@@ -29,15 +29,63 @@ export class CreateUserDto {
   @IsString()
   avatar?: string;
 
-  @ApiPropertyOptional({ description: 'User role', enum: ['user', 'admin', 'brand'] })
+  @ApiPropertyOptional({ description: 'User role', enum: ['clipper', 'brand', 'admin'] })
   @IsOptional()
-  @IsEnum(['user', 'admin', 'brand'])
-  role?: 'user' | 'admin' | 'brand';
+  @IsEnum(['clipper', 'brand', 'admin'])
+  role?: 'clipper' | 'brand' | 'admin';
 
   @ApiPropertyOptional({ description: 'User wallet address' })
   @IsOptional()
   @IsString()
   walletAddress?: string;
+
+  // Brand-specific fields
+  @ApiPropertyOptional({ description: 'Company name (required for brand role)' })
+  @IsOptional()
+  @IsString()
+  companyName?: string;
+
+  @ApiPropertyOptional({ description: 'Company website' })
+  @IsOptional()
+  @IsString()
+  website?: string;
+
+  @ApiPropertyOptional({ description: 'Company description' })
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @ApiPropertyOptional({ description: 'Company industry' })
+  @IsOptional()
+  @IsString()
+  industry?: string;
+
+  @ApiPropertyOptional({ description: 'Team size' })
+  @IsOptional()
+  @IsString()
+  teamSize?: string;
+
+  // Clipper-specific fields
+  @ApiPropertyOptional({ description: 'Bio for content creators' })
+  @IsOptional()
+  @IsString()
+  bio?: string;
+
+  @ApiPropertyOptional({ description: 'Content categories' })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  categories?: string[];
+
+  @ApiPropertyOptional({ description: 'Social media links' })
+  @IsOptional()
+  socialLinks?: Array<{
+    platform: string;
+    username: string;
+    url: string;
+    verified?: boolean;
+    followers?: number;
+  }>;
 
   @ApiPropertyOptional({ description: 'Social media accounts' })
   @IsOptional()
@@ -46,5 +94,6 @@ export class CreateUserDto {
     instagram?: string;
     youtube?: string;
     tiktok?: string;
+    linkedin?: string;
   };
 }

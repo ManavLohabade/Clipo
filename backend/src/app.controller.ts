@@ -12,6 +12,17 @@ export class AppController {
 
   @Get('health')
   getHealth(): { status: string; timestamp: string } {
-    return this.appService.getHealth();
+    return {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  @Get('test')
+  getTest(): { message: string; jwt: boolean } {
+    return {
+      message: 'Backend is working!',
+      jwt: !!process.env.JWT_SECRET,
+    };
   }
 }

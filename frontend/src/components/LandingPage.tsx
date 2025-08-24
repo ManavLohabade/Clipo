@@ -1,380 +1,262 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Zap, 
-  Users, 
-  TrendingUp, 
-  Shield, 
-  DollarSign, 
-  Globe,
-  ArrowRight,
-  CheckCircle,
-  Star,
-  Play,
-  Sparkles,
-  ChevronDown
-} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { BookOpen, ArrowRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useCampaigns } from '@/contexts/CampaignContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { UserRole } from '@/types';
-import { useNavigate } from 'react-router-dom';
+import ProfileButton from '@/components/ui/ProfileButton';
 
-const BRAND_LOGOS = [
-  { name: 'Spotify', width: 120 },
-  { name: 'Allianz', width: 100 },
-  { name: 'Coca-Cola', width: 140 },
-  { name: 'Gillette', width: 110 },
-  { name: 'Netflix', width: 100 },
-];
-
-const FEATURES = [
-  {
-    icon: Zap,
-    title: 'AI-Powered Matching',
-    description: 'Our AI connects brands with the perfect creators based on audience, engagement, and brand alignment.',
-  },
-  {
-    icon: Shield,
-    title: 'Fraud Protection',
-    description: 'Advanced fraud detection ensures authentic engagement and protects both brands and creators.',
-  },
-  {
-    icon: DollarSign,
-    title: 'Crypto & Fiat Payouts',
-    description: 'Flexible payment options with USDC on Base/Polygon or traditional fiat via Stripe.',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Real-Time Analytics',
-    description: 'Track campaign performance with comprehensive analytics and ROI insights.',
-  },
-  {
-    icon: Users,
-    title: 'Global Creator Network',
-    description: 'Access thousands of verified micro-creators across all major social platforms.',
-  },
-  {
-    icon: Globe,
-    title: 'Multi-Platform Support',
-    description: 'Run campaigns across X, Instagram, YouTube, TikTok, and Facebook seamlessly.',
-  },
-];
-
-const STATS = [
-  { value: '10M+', label: 'Content Views Generated' },
-  { value: '5K+', label: 'Active Creators' },
-  { value: '500+', label: 'Brand Partners' },
-  { value: '$2M+', label: 'Creator Earnings Paid' },
-];
-
-export default function LandingPage() {
-  const { loginAs } = useAuth();
+const LandingPage: React.FC = () => {
+  const { campaigns } = useCampaigns();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState<UserRole | null>(null);
+  const { user, logout } = useAuth();
 
-  const handleRoleSelection = async (role: UserRole) => {
-    if (role === 'guest') {
-      navigate('/auth/login');
-      return;
-    }
+  // Social media icon components with exact colors and styling
+  const SocialMediaIcon = ({ platform, className = "" }: { platform: string; className?: string }) => {
+    const getIconAndColor = (platform: string) => {
+      switch (platform.toLowerCase()) {
+        case 'instagram':
+          return { icon: '📷', color: 'bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500' };
+        case 'tiktok':
+          return { icon: '🎵', color: 'bg-black' };
+        case 'youtube':
+          return { icon: '▶', color: 'bg-red-600' };
+        case 'x':
+        case 'twitter':
+          return { icon: '𝕏', color: 'bg-black' };
+        case 'linkedin':
+          return { icon: '💼', color: 'bg-blue-600' };
+        default:
+          return { icon: '🌐', color: 'bg-gray-600' };
+      }
+    };
 
-    setIsLoading(role);
-    try {
-      await loginAs(role);
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Login error:', error);
-    } finally {
-      setIsLoading(null);
-    }
+    const { icon, color } = getIconAndColor(platform);
+    return (
+      <div className={`w-6 h-6 rounded-sm flex items-center justify-center text-white text-xs font-semibold ${color} ${className}`}>
+        {icon}
+      </div>
+    );
+  };
+
+  const handleCampaignClick = (campaignId: number) => {
+    navigate(`/campaign/${campaignId}`);
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="border-b border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+    <div className="min-h-screen bg-black text-white">
+      {/* Header */}
+      <header className="border-b border-gray-800 bg-black/95 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Left Side - Logo */}
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-primary-foreground" />
+              <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">C</span>
               </div>
-            <span className="text-xl font-bold text-gradient">Clipper Dapp</span>
-            </div>
-            <div className="hidden md:flex items-center space-x-6">
-              <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">Features</a>
-              <a href="#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">How it Works</a>
-              <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">Pricing</a>
-              <Button variant="outline" onClick={() => navigate('/auth/login')}>Sign In</Button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="relative py-20 lg:py-32 bg-mesh overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute top-1/3 -right-10 w-60 h-60 bg-primary-glow/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute bottom-10 left-1/3 w-32 h-32 bg-primary/5 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '4s' }}></div>
-        </div>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-4xl mx-auto">
-            <Badge className="mb-6 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 animate-fade-in">
-              🚀 Phase 2 AI Features Now Live
-            </Badge>
-            
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              Start crafting your{' '}
-              <span className="text-gradient animate-pulse-glow">brand story</span>
-            </h1>
-            
-            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-              PARTNER WITH US TO CREATE A{' '}
-              <span className="relative inline-block">
-                <span className="bg-primary text-primary-foreground px-4 py-2 rounded-lg transform -rotate-1 hover:rotate-0 transition-transform duration-300 hover:scale-105">
-                  COMPELLING
-                </span>
-              </span>{' '}
-              NARRATIVE FOR YOUR BRAND!
-            </h2>
-            
-            <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: '0.6s' }}>
-              Let's bring your ideas to life, start collaborating with our creative 
-              agency and turn your vision into reality.
-            </p>
-
-            {/* Main Role Selection Cards */}
-            <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-12 animate-fade-in" style={{ animationDelay: '0.8s' }}>
-              <Card className="card-glass hover:shadow-glow transition-all duration-500 group cursor-pointer border-2 hover:border-primary/50 hover:scale-105 hover:-translate-y-2"
-                    onClick={() => handleRoleSelection('brand')}>
-                <CardHeader className="text-center pb-2">
-                  <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-4 group-hover:animate-pulse-glow group-hover:scale-110 transition-transform duration-300">
-                    <TrendingUp className="h-6 w-6 text-primary-foreground" />
-                  </div>
-                  <CardTitle className="text-lg">Join as Brand</CardTitle>
-                  <CardDescription>Launch campaigns and connect with creators</CardDescription>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <ul className="text-sm text-muted-foreground space-y-2">
-                    <li className="flex items-center justify-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
-                      Create campaigns
-                    </li>
-                    <li className="flex items-center justify-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
-                      AI-powered matching
-                    </li>
-                    <li className="flex items-center justify-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
-                      Real-time analytics
-                    </li>
-                  </ul>
-                </CardContent>
-                <CardFooter>
-                  <Button 
-                    className="w-full btn-hero" 
-                    disabled={isLoading === 'brand'}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRoleSelection('brand');
-                    }}
-                  >
-                    {isLoading === 'brand' ? 'Loading...' : 'Get Started'}
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </CardFooter>
-              </Card>
-
-              <Card className="card-glass hover:shadow-glow transition-all duration-500 group cursor-pointer border-2 hover:border-primary/50 hover:scale-105 hover:-translate-y-2"
-                    onClick={() => handleRoleSelection('clipper')}>
-                <CardHeader className="text-center pb-2">
-                  <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-4 group-hover:animate-pulse-glow group-hover:scale-110 transition-transform duration-300">
-                    <Users className="h-6 w-6 text-primary-foreground" />
-                  </div>
-                  <CardTitle className="text-lg">Join as Creator</CardTitle>
-                  <CardDescription>Monetize your content and build your brand</CardDescription>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <ul className="text-sm text-muted-foreground space-y-2">
-                    <li className="flex items-center justify-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
-                      Earn from content
-                    </li>
-                    <li className="flex items-center justify-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
-                      Flexible payouts
-                    </li>
-                    <li className="flex items-center justify-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-primary" />
-                      Creative tools
-                    </li>
-                  </ul>
-                </CardContent>
-                <CardFooter>
-                  <Button 
-                    className="w-full btn-hero" 
-                    disabled={isLoading === 'clipper'}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRoleSelection('clipper');
-                    }}
-                  >
-                    {isLoading === 'clipper' ? 'Loading...' : 'Start Creating'}
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </CardFooter>
-              </Card>
+              <span className="text-orange-500 font-bold text-xl">Clipper</span>
             </div>
 
-            {/* Admin Access - Separate Section */}
-            <div className="mt-12 pt-8 border-t border-border/50">
-              <div className="text-center mb-6">
-                <p className="text-sm text-muted-foreground">Platform Administration</p>
-              </div>
-              <div className="max-w-sm mx-auto">
-                <Card className="card-glass hover:shadow-glow transition-all duration-300 group cursor-pointer border-2 hover:border-primary/50"
-                      onClick={() => handleRoleSelection('admin')}>
-                  <CardHeader className="text-center pb-2">
-                    <div className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-3 group-hover:animate-pulse-glow">
-                      <Shield className="h-5 w-5 text-primary-foreground" />
-                    </div>
-                    <CardTitle className="text-base">Admin Access</CardTitle>
-                    <CardDescription className="text-sm">Platform management and oversight</CardDescription>
-                  </CardHeader>
-                  <CardFooter>
-                    <Button 
-                      variant="outline"
-                      className="w-full" 
-                      disabled={isLoading === 'admin'}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRoleSelection('admin');
-                      }}
-                    >
-                      {isLoading === 'admin' ? 'Loading...' : 'Admin Panel'}
-                      <ArrowRight className="ml-2 h-4 w-4" />
+            {/* Center Navigation - Focused on Content Rewards */}
+            <nav className="hidden lg:flex items-center space-x-8">
+              <Link to="/discover" className="text-gray-300 hover:text-white transition-colors">Discover</Link>
+              <Link to="/content-rewards" className="text-white font-medium border-b-2 border-purple-500 pb-1">Content Rewards</Link>
+              <Link to="/create-campaign" className="text-gray-300 hover:text-white transition-colors">Create Campaign</Link>
+            </nav>
+
+            {/* Right Side - Auth & Actions */}
+            <div className="flex items-center space-x-4">
+              {user ? (
+                <ProfileButton 
+                  user={user}
+                  onLogout={logout}
+                  onClick={() => navigate('/profile')}
+                />
+              ) : (
+                <div className="flex items-center space-x-3">
+                  <Link to="/register">
+                    <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white px-4 py-2 font-medium">
+                      Sign up
                     </Button>
-                  </CardFooter>
-                </Card>
-              </div>
-            </div>
-
-            <div className="text-center">
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="btn-hero-outline"
-                onClick={() => navigate('/auth/login')}
-              >
-                Already have an account? Sign In
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Trusted by brands */}
-        <div className="mt-20">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <p className="text-center text-muted-foreground mb-8">Trusted by leading brands worldwide</p>
-            <div className="flex justify-center items-center space-x-8 opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-500">
-              {BRAND_LOGOS.map((brand) => (
-                <div key={brand.name} className="text-2xl font-bold text-muted-foreground">
-                  {brand.name}
+                  </Link>
+                  <Link to="/login">
+                    <Button className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 font-medium">
+                      Sign in
+                    </Button>
+                  </Link>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
-      </section>
+      </header>
 
-      {/* Stats Section */}
-      <section className="py-16 bg-card/30">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {STATS.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-3xl lg:text-4xl font-bold text-gradient mb-2">{stat.value}</div>
-                <div className="text-muted-foreground">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Why Choose Clipper Dapp?</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              The most advanced platform for brand-creator collaboration, powered by cutting-edge technology.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {FEATURES.map((feature, index) => (
-              <Card key={index} className="card-glass hover:shadow-glow transition-all duration-500 group hover:scale-105 hover:-translate-y-1" 
-                    style={{ animationDelay: `${index * 0.1}s` }}>
-                <CardHeader>
-                  <div className="w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center mb-4 group-hover:animate-pulse-glow group-hover:scale-110 transition-transform duration-300">
-                    <feature.icon className="h-6 w-6 text-primary-foreground" />
+      {/* Main Content */}
+      <main className="flex-1 p-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Hero Section */}
+          <div className="mb-12">
+            <div className="flex items-start justify-between mb-8">
+              <div className="max-w-3xl">
+                <h1 className="text-5xl font-bold text-white mb-6 leading-tight">
+                  Content Rewards
+                </h1>
+                <p className="text-xl text-gray-300 leading-relaxed mb-6">
+                  Post content on social media and get paid for the views you generate.{' '}
+                  <Link to="/create-campaign" className="text-blue-400 hover:underline font-medium">
+                    If you want to launch a campaign click here
+                  </Link>
+                </p>
+                <div className="flex items-center space-x-6">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-gray-400">{campaigns.length} live Content Rewards</span>
                   </div>
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
+                  <div className="flex items-center space-x-2 text-gray-400">
+                    <span>•</span>
+                    <span>Join thousands of creators</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex-shrink-0">
+                <Button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 text-lg flex items-center space-x-2">
+                  <BookOpen className="w-5 h-5" />
+                  <span>Learn</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="flex items-center space-x-4 mb-8">
+            <Badge variant="secondary" className="bg-purple-500 text-white px-4 py-2 rounded-full text-sm font-medium">
+              All Campaigns
+            </Badge>
+            <Badge variant="secondary" className="bg-gray-800 text-white px-4 py-2 rounded-full text-sm hover:bg-gray-700 cursor-pointer">
+              Clipping
+            </Badge>
+            <Badge variant="secondary" className="bg-gray-800 text-white px-4 py-2 rounded-full text-sm hover:bg-gray-700 cursor-pointer">
+              UGC
+            </Badge>
+            <Badge variant="secondary" className="bg-gray-800 text-white px-4 py-2 rounded-full text-sm hover:bg-gray-700 cursor-pointer">
+              Live Content
+            </Badge>
+          </div>
+
+          {/* Campaigns Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {campaigns.map((campaign) => (
+              <Card
+                key={campaign.id}
+                className="bg-gray-900 border-gray-700 hover:border-gray-600 transition-all duration-200 cursor-pointer hover:bg-gray-800 hover:shadow-xl hover:shadow-gray-900/20 group"
+                onClick={() => handleCampaignClick(campaign.id)}
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gray-700 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <span className="text-white font-bold text-xl">{campaign.icon}</span>
+                      </div>
+                      <div>
+                        <CardTitle className="text-white text-lg font-semibold group-hover:text-orange-400 transition-colors">
+                          {campaign.brand}
+                        </CardTitle>
+                        <CardDescription className="text-gray-400 text-sm">{campaign.type}</CardDescription>
+                      </div>
+                    </div>
+                    {campaign.verified && (
+                      <Badge className="bg-green-500 text-white text-xs px-2 py-1">
+                        Verified
+                      </Badge>
+                    )}
+                  </div>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">{feature.description}</p>
+                <CardContent className="space-y-4">
+                  <h3 className="text-white text-xl font-semibold leading-tight group-hover:text-orange-300 transition-colors">
+                    {campaign.title}
+                  </h3>
+                  
+                  <div className="flex items-center justify-between text-gray-300 text-sm">
+                    <span className="font-medium">{campaign.rate}</span>
+                    <span className="text-gray-400">Budget: {campaign.budget}</span>
+                  </div>
+                  
+                  {/* Progress Bar */}
+                  <div className="space-y-2">
+                    <div className="w-full bg-gray-700 rounded-full h-2">
+                      <div
+                        className="bg-gradient-to-r from-orange-500 to-red-500 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${Math.max(campaign.percentage, 5)}%` }}
+                      ></div>
+                    </div>
+                    <div className="flex items-center justify-between text-gray-400 text-sm">
+                      <span>Paid out: {campaign.paidOut}</span>
+                      <span className="font-medium">{campaign.percentage}%</span>
+                    </div>
+                  </div>
+                  
+                  {/* Social Media Platforms */}
+                  <div className="flex space-x-2">
+                    {campaign.platforms.map((platform, index) => (
+                      <SocialMediaIcon key={index} platform={platform} />
+                    ))}
+                  </div>
+                  
+                  {/* Views & Stats */}
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center space-x-2 text-gray-400">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <span>Views: {campaign.views}</span>
+                    </div>
+                    <div className="text-gray-500 text-xs">
+                      Active now
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary/10 via-primary-glow/10 to-primary/10">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-6">Ready to Transform Your Brand Story?</h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join thousands of brands and creators already using Clipper Dapp to create compelling narratives and drive engagement.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="btn-hero" onClick={() => handleRoleSelection('brand')}>
-              Start as Brand
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button size="lg" variant="outline" className="btn-hero-outline" onClick={() => handleRoleSelection('clipper')}>
-              Join as Creator
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-border/50 py-12 bg-card/30">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="text-xl font-bold text-gradient">Clipper Dapp</span>
-            </div>
-            <div className="flex items-center space-x-6 text-sm text-muted-foreground">
-              <span>35 N Dearborn ST, Chicago, IL 60601, USA</span>
-              <span>+1-202-555-0156</span>
-              <span>info@clipper.dao</span>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              © 2023 Clipper Dapp. All rights reserved.
+          {/* Call to Action */}
+          <div className="text-center mt-16 p-8 bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl border border-gray-700">
+            <h2 className="text-2xl font-bold text-white mb-4">Ready to start earning?</h2>
+            <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+              Join thousands of creators who are already making money with Content Rewards. 
+              Create your first campaign today and start building your income.
+            </p>
+            <div className="flex items-center justify-center space-x-4">
+              {user ? (
+                <Link to="/create-campaign">
+                  <Button className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 text-lg">
+                    Create Campaign
+                  </Button>
+                </Link>
+              ) : (
+                <>
+                  <Link to="/register">
+                    <Button className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 text-lg">
+                      Get Started
+                    </Button>
+                  </Link>
+                  <Link to="/login">
+                    <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700 hover:text-white px-8 py-3 text-lg">
+                      Sign In
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
-      </footer>
+      </main>
     </div>
   );
-}
+};
+
+export default LandingPage;

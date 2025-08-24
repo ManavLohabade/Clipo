@@ -11,11 +11,12 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   loginAs: (role: UserRole) => Promise<void>; // Demo mode
   logout: () => Promise<void>;
-  register: (email: string, password: string, role: UserRole) => Promise<void>;
+  register: (email: string, password: string, role: UserRole, profile: any) => Promise<void>;
   connectWallet: (address: string) => Promise<void>;
   disconnectWallet: () => Promise<void>;
   walletAddress: string | null;
   isWalletConnected: boolean;
+  getProfileData: () => { name?: string; email?: string; avatar?: string } | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,9 +31,7 @@ const DEMO_USERS: Record<UserRole, User> = {
     firstName: 'Demo',
     lastName: 'Brand',
     avatar: '/api/placeholder/128/128',
-    isEmailVerified: true,
-    isProfileComplete: true,
-    socialMediaAccounts: {},
+    isKycVerified: true,
     createdAt: new Date(),
     updatedAt: new Date()
   },
@@ -44,9 +43,7 @@ const DEMO_USERS: Record<UserRole, User> = {
     firstName: 'Demo',
     lastName: 'Creator',
     avatar: '/api/placeholder/128/128',
-    isEmailVerified: true,
-    isProfileComplete: true,
-    socialMediaAccounts: {},
+    isKycVerified: true,
     createdAt: new Date(),
     updatedAt: new Date()
   },
@@ -58,9 +55,7 @@ const DEMO_USERS: Record<UserRole, User> = {
     firstName: 'Demo',
     lastName: 'Admin',
     avatar: '/api/placeholder/128/128',
-    isEmailVerified: true,
-    isProfileComplete: true,
-    socialMediaAccounts: {},
+    isKycVerified: true,
     createdAt: new Date(),
     updatedAt: new Date()
   },
@@ -72,9 +67,7 @@ const DEMO_USERS: Record<UserRole, User> = {
     firstName: 'Guest',
     lastName: 'User',
     avatar: '/api/placeholder/128/128',
-    isEmailVerified: false,
-    isProfileComplete: false,
-    socialMediaAccounts: {},
+    isKycVerified: false,
     createdAt: new Date(),
     updatedAt: new Date()
   }
@@ -134,16 +127,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const register = async (email: string, password: string, role: UserRole) => {
+  const register = async (email: string, password: string, role: UserRole, profile: any) => {
     try {
-      const profile = role === 'brand' 
-        ? { companyName: 'New Company', website: '', description: '' }
-        : { bio: 'New creator', categories: [], socialLinks: [] };
-
       const response = await AuthService.register(email, password, role, profile);
       if (response.data) {
-        setUser(response.data);
-        // Note: In real implementation, user would need to verify email
+        // After successful registration, automatically log in
+        await login(email, password);
       } else {
         throw new Error(response.error?.message || 'Registration failed');
       }
@@ -171,6 +160,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsWalletConnected(false);
   };
 
+  const getProfileData = () => {
+    if (!user) return null;
+    return {
+      name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : undefined,
+      email: user.email,
+      avatar: user.avatar
+    };
+  };
+
   const value: AuthContextType = {
     user,
     isLoading,
@@ -183,6 +181,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     disconnectWallet,
     walletAddress,
     isWalletConnected,
+    getProfileData,
   };
 
   return (
